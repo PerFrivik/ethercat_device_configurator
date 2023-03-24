@@ -36,9 +36,9 @@
  */
 #include "ethercat_device_configurator/EthercatDeviceConfigurator.hpp"
 
-#ifdef _ANYDRIVE_FOUND_
+// #ifdef _ANYDRIVE_FOUND_
 #include <anydrive/Anydrive.hpp>
-#endif
+// #endif
 #ifdef _ELMO_FOUND_
 #include <elmo_ethercat_sdk/Elmo.hpp>
 #endif
@@ -50,12 +50,69 @@
 #endif
 #include <thread>
 #include <csignal>
+#include <ros/ros.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/Float64.h>
+#include <std_msgs/Int32MultiArray.h>
+#include <std_msgs/Float64MultiArray.h>
+#include <sensor_msgs/Joy.h>
+
+
+
+
+
+
+
+//Global variables
+double velocity = 0;
+sensor_msgs::Joy latest_joy_msg; 
+ros::Time last_callback_time;
+ros::Publisher  readingextended_1;
+ros::Publisher  readingextended_2;
+
+
+
+
+
+
 std::unique_ptr<std::thread> worker_thread;
 bool abrt = false;
 
 EthercatDeviceConfigurator::SharedPtr configurator;
 
 unsigned int counter = 0;
+
+void rcCallback(const sensor_msgs::Joy::ConstPtr& rc_msg){
+
+    latest_joy_msg = *rc_msg; 
+
+}
+
+
+void motorVelCallback(const std_msgs::Float64::ConstPtr& msg)
+{
+    // Set the motor velocity using the received message value
+    velocity = msg->data;
+    last_callback_time = ros::Time::now();
+    // std::cout << "I updated the velocity to: " << velocity << std::endl;
+    
+}
+
+
+void timerCallback(const ros::TimerEvent&)
+{
+    ros::Duration time_since_last_callback = ros::Time::now() - last_callback_time;
+
+    if (time_since_last_callback.toSec() > 0.2) // 1 second timeout
+    {
+        std::cout << "im in here, vel should be back to 0" << std::endl;
+        velocity = 0;
+    }
+}
+
+
+
+
 
 void worker()
 {
@@ -104,18 +161,52 @@ void worker()
             // Anydrive
             if(configurator->getInfoForSlave(slave).type == EthercatDeviceConfigurator::EthercatSlaveType::Anydrive)
             {
-#ifdef _ANYDRIVE_FOUND_
                 anydrive::AnydriveEthercatSlave::SharedPtr any_slave_ptr = std::dynamic_pointer_cast<anydrive::AnydriveEthercatSlave>(slave);
+
+                // if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Calibrate){
+
+                //     // anydrive::calibration::CalibrationModeEnum::GearAndJointEncoderHoming
+                //     anydrive::Command cmd_cal;
+                //     // anydrive::AnydriveEthercatSlave::sendCalibrationGearAndJointEncoderHomingNewJointPosition() 
+                //     cmd_cal.setModeEnum(anydrive::calibration::CalibrationModeEnum::GearAndJointEncoderHoming);
+                
+                    
+                // }
+                std::string name_of_motor; 
+
+                name_of_motor = any_slave_ptr->getName();
+
+                // std::cout << " " << std::endl;
+                // std::cout << "name of the motor: " << name_of_motor << std::endl;
+                // std::cout << " " << std::endl;
 
                 if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::ControlOp)
                 {
                     anydrive::Command cmd;
-                    cmd.setModeEnum(anydrive::mode::ModeEnum::MotorVelocity);
-                    cmd.setMotorVelocity(10);
+                    cmd.setModeEnum(anydrive::mode::ModeEnum::JointVelocity);
+                    // cmd.setModeEnum(anydrive::mode::ModeEnum::)
+                    // std::cout << "motor vel: " << velocity << std::endl;
+
+
+                    // cmd.setPidGains()
+
+                    if (any_slave_ptr->getName() == "Dynadrive1"){
+                        cmd.setJointVelocity(velocity);
+                    }
+
+                    if (any_slave_ptr->getName() == "Dynadrive2"){
+                        cmd.setJointVelocity(velocity);
+                    }
+                    
+                    
+
+                    // cmd.setJointVelocity()
+
+                                    
+                    
 
                     any_slave_ptr->setCommand(cmd);
                 }
-#endif
 
             }
             // Rokubi
@@ -207,7 +298,9 @@ void worker()
 ** Note: This logic is executed in a thread separated from the communication update!
  */
 void signal_handler(int sig)
-{
+{   
+
+    ros::shutdown();
     /*
     ** Pre shutdown procedure.
     ** The devices execute procedures (e.g. state changes) that are necessary for a
@@ -241,14 +334,46 @@ void signal_handler(int sig)
     exit(0);
 }
 
-#ifdef _ANYDRIVE_FOUND_
+
+
+
+
 // Some dummy callbacks
 void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended& reading)
 {
-    // std::cout << "Reading of anydrive '" << name << "'\n"
-    //           << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
+    std::cout << "Reading of anydrive '" << name << "'\n"
+              << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
+    std::cout << "Position: " << reading.getState().getJointPosition() << std::endl;
+
+    std_msgs::Float64MultiArray pub_read_1;
+    std_msgs::Float64MultiArray pub_read_2; 
+
+    pub_read_1.data.resize(2); // Resize the data vector to store 2 elements
+    pub_read_2.data.resize(2); // Resize the data vector to store 2 elements
+
+    if (name == "Dynadrive1"){
+
+        pub_read_1.data[0] = reading.getState().getJointPosition();
+        pub_read_1.data[1] = reading.getState().getJointVelocity();
+        readingextended_1.publish(pub_read_1);
+
+    }
+
+    if (name == "Dynadrive2"){
+
+        pub_read_2.data[0] = reading.getState().getJointPosition();
+        pub_read_2.data[1] = reading.getState().getJointVelocity();
+        readingextended_2.publish(pub_read_2);
+    }
+    
+    
+    
 }
-#endif
+
+
+
+
+
 #ifdef _ROKUBI_FOUND_
 void rokubiReadingCb(const std::string& name, const rokubimini::Reading& reading)
 {
@@ -257,14 +382,34 @@ void rokubiReadingCb(const std::string& name, const rokubimini::Reading& reading
 }
 #endif
 
+void subscriberThread()
+{   
+     last_callback_time = ros::Time::now();
+    ros::NodeHandle nh;
+    ros::Subscriber motor_vel_sub = nh.subscribe("/motor_velocity", 10, motorVelCallback);  
+    ros::Subscriber rc_state = nh.subscribe("/rc", 10, rcCallback);
+    readingextended_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_1",1);
+    readingextended_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_2",1);
+    ros::Timer timer = nh.createTimer(ros::Duration(0.1), timerCallback); // 100ms timer
 
+    ros::spin();
+}
 
 /*
 ** Program entry.
 ** Pass the path to the setup.yaml file as first command line argument.
  */
 int main(int argc, char**argv)
-{
+{   
+
+    ros::init(argc, argv, "motor_controller_node");
+    ros::NodeHandle nh;
+
+    // Declare a subscriber to the topic /motor_velocity
+    // ros::Subscriber motor_vel_sub = nh.subscribe("/motor_velocity", 10, motorVelCallback);
+
+    std::thread subscriber(subscriberThread);
+
     // Set the abrt_ flag upon receiving an interrupt signal (e.g. Ctrl-c)
     std::signal(SIGINT, signal_handler);
 

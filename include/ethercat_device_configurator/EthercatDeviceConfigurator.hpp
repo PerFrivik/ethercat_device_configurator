@@ -19,6 +19,7 @@
 #include <ethercat_sdk_master/EthercatMaster.hpp>
 #include <type_traits>
 
+
 class EthercatDeviceConfigurator
 {
 public:
