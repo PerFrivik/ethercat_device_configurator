@@ -64,7 +64,8 @@
 
 
 //Global variables
-double velocity = 0;
+double velocity_1 = 0;
+double velocity_2 = 0;
 sensor_msgs::Joy latest_joy_msg; 
 ros::Time last_callback_time;
 ros::Publisher  readingextended_1;
@@ -89,10 +90,19 @@ void rcCallback(const sensor_msgs::Joy::ConstPtr& rc_msg){
 }
 
 
-void motorVelCallback(const std_msgs::Float64::ConstPtr& msg)
+void motorVelCallback_1(const std_msgs::Float64::ConstPtr& msg)
 {
     // Set the motor velocity using the received message value
-    velocity = msg->data;
+    velocity_1 = msg->data;
+    last_callback_time = ros::Time::now();
+    // std::cout << "I updated the velocity to: " << velocity << std::endl;
+    
+}
+
+void motorVelCallback_2(const std_msgs::Float64::ConstPtr& msg)
+{
+    // Set the motor velocity using the received message value
+    velocity_2 = msg->data;
     last_callback_time = ros::Time::now();
     // std::cout << "I updated the velocity to: " << velocity << std::endl;
     
@@ -106,7 +116,8 @@ void timerCallback(const ros::TimerEvent&)
     if (time_since_last_callback.toSec() > 0.2) // 1 second timeout
     {
         std::cout << "im in here, vel should be back to 0" << std::endl;
-        velocity = 0;
+        velocity_1 = 0;
+        velocity_2 = 0;
     }
 }
 
@@ -191,11 +202,11 @@ void worker()
                     // cmd.setPidGains()
 
                     if (any_slave_ptr->getName() == "Dynadrive1"){
-                        cmd.setJointVelocity(velocity);
+                        cmd.setJointVelocity(velocity_1);
                     }
 
                     if (any_slave_ptr->getName() == "Dynadrive2"){
-                        cmd.setJointVelocity(velocity);
+                        cmd.setJointVelocity(velocity_2);
                     }
                     
                     
@@ -386,7 +397,8 @@ void subscriberThread()
 {   
      last_callback_time = ros::Time::now();
     ros::NodeHandle nh;
-    ros::Subscriber motor_vel_sub = nh.subscribe("/motor_velocity", 10, motorVelCallback);  
+    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_1", 10, motorVelCallback_1);  
+    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_2", 10, motorVelCallback_2);  
     ros::Subscriber rc_state = nh.subscribe("/rc", 10, rcCallback);
     readingextended_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_1",1);
     readingextended_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_2",1);
