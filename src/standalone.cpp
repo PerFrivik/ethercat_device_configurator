@@ -385,13 +385,13 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
 
 
 
-#ifdef _ROKUBI_FOUND_
-void rokubiReadingCb(const std::string& name, const rokubimini::Reading& reading)
-{
-    // std::cout << "Reading of rokubi '" << name << "'\n"
-    //           << "Force X: " << reading.getForceX() << "\n\n";
-}
-#endif
+// #ifdef _ROKUBI_FOUND_
+// void rokubiReadingCb(const std::string& name, const rokubimini::Reading& reading)
+// {
+//     // std::cout << "Reading of rokubi '" << name << "'\n"
+//     //           << "Force X: " << reading.getForceX() << "\n\n";
+// }
+// #endif
 
 void subscriberThread()
 {   
@@ -439,17 +439,17 @@ int main(int argc, char**argv)
     ** configurator->getSlavesOfType is another way of extracting only the evices
     ** of a ceratin type.
      */
-#ifdef _ANYDRIVE_FOUND_
+// #ifdef _ANYDRIVE_FOUND_
     for(const auto& device : configurator->getSlavesOfType<anydrive::AnydriveEthercatSlave>())
     {
         device->addReadingCb(anydriveReadingCb);
     }
-#endif
-#if _ROKUBI_FOUND_
-    for(const auto& device : configurator->getSlavesOfType<rokubimini::ethercat::RokubiminiEthercat>()){
-        device->addReadingCb(rokubiReadingCb);
-    }
-#endif
+// #endif
+// #if _ROKUBI_FOUND_
+//     for(const auto& device : configurator->getSlavesOfType<rokubimini::ethercat::RokubiminiEthercat>()){
+//         device->addReadingCb(rokubiReadingCb);
+//     }
+// #endif
 
     /*
     ** Start all masters.
@@ -478,7 +478,7 @@ int main(int argc, char**argv)
     for(auto & slave: configurator->getSlaves())
     {
         std::cout << " " << slave->getName() << ": " << slave->getAddress() << std::endl;
-#ifdef _ANYDRIVE_FOUND_
+// #ifdef _ANYDRIVE_FOUND_
         if(configurator->getInfoForSlave(slave).type == EthercatDeviceConfigurator::EthercatSlaveType::Anydrive)
         {
             // Downcasting using shared pointers
@@ -486,7 +486,7 @@ int main(int argc, char**argv)
             any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
             std::cout << "Putting slave into operational mode: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
         }
-#endif
+// #endif
     }
 
 
