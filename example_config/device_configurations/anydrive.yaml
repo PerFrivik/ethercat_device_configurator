@@ -131,7 +131,7 @@ joint_torque_integrator_saturation: 40.0
 # Unit                              -
 # Range                             {-1, 1}
 # Default                           Value stored on device.
-direction:                          1
+direction:                          -1
 
 # Parameter                         joint_position_limits
 # Description                       Map containing the joint position limits.
@@ -187,8 +187,8 @@ joint_position_limits:
     # Unit                          rad
     # Range                         (-.inf, .inf)
     # Default                       Value stored on device.
-    min:                            0.0
-    max:                            0.0
+    min:                            -1.5708
+    max:                            1.5708
 
   # Parameter                       hard
   # Description                     Map containing the hard joint position 

@@ -70,6 +70,8 @@ sensor_msgs::Joy latest_joy_msg;
 ros::Time last_callback_time;
 ros::Publisher  readingextended_1;
 ros::Publisher  readingextended_2;
+anydrive::ReadingExtended readingex_1;
+anydrive::ReadingExtended readingex_2;
 
 
 
@@ -201,13 +203,34 @@ void worker()
 
                     // cmd.setPidGains()
 
+                    // if (((readingex_1.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)) && any_slave_ptr->getName() == "Dynadrive2"){
+                    //     cmd.setJointVelocity(0);
+                    // } 
+                    // if (any_slave_ptr->getName() == "Dynadrive2"){
+                    //     cmd.setJointVelocity(velocity_1);
+                    // } 
+                    // if (((readingex_2.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)) && any_slave_ptr->getName() == "Dynadrive1"){
+                    //     cmd.setJointVelocity(0);
+                    // } 
+                    // if (any_slave_ptr->getName() == "Dynadrive1"){
+                    //     cmd.setJointVelocity(velocity_2);
+                    // }
+
                     if (any_slave_ptr->getName() == "Dynadrive1"){
-                        cmd.setJointVelocity(velocity_1);
+                        if ((readingex_1.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)){
+                            cmd.setJointVelocity(0);
+                        } else {
+                            cmd.setJointVelocity(velocity_1);
+                        }
+                     } 
+                    if (any_slave_ptr->getName() == "Dynadrive2"){
+                        if ((readingex_2.getState().getJointPosition() >= 1.48353) || (readingex_2.getState().getJointPosition() <= -1.48353)){
+                            cmd.setJointVelocity(0);
+                        } else {
+                            cmd.setJointVelocity(velocity_2);
+                        }
                     }
 
-                    if (any_slave_ptr->getName() == "Dynadrive2"){
-                        cmd.setJointVelocity(velocity_2);
-                    }
                     
                     
 
@@ -364,6 +387,8 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
 
     if (name == "Dynadrive1"){
 
+        readingex_1 = reading;
+
         pub_read_1.data[0] = reading.getState().getJointPosition();
         pub_read_1.data[1] = reading.getState().getJointVelocity();
         readingextended_1.publish(pub_read_1);
@@ -371,6 +396,8 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
     }
 
     if (name == "Dynadrive2"){
+
+        readingex_2 = reading;
 
         pub_read_2.data[0] = reading.getState().getJointPosition();
         pub_read_2.data[1] = reading.getState().getJointVelocity();
