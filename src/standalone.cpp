@@ -66,12 +66,18 @@
 //Global variables
 double velocity_1 = 0;
 double velocity_2 = 0;
+double position_1 = 0;
+double position_2 = 0; 
 sensor_msgs::Joy latest_joy_msg; 
 ros::Time last_callback_time;
-ros::Publisher  readingextended_1;
-ros::Publisher  readingextended_2;
-anydrive::ReadingExtended readingex_1;
-anydrive::ReadingExtended readingex_2;
+ros::Publisher  readingextended_vel_1;
+ros::Publisher  readingextended_vel_2;
+ros::Publisher  readingextended_pos_1;
+ros::Publisher  readingextended_pos_2;
+anydrive::ReadingExtended readingex_vel_1;
+anydrive::ReadingExtended readingex_vel_2;
+anydrive::ReadingExtended readingex_pos_1;
+anydrive::ReadingExtended readingex_pos_2;
 
 
 
@@ -105,6 +111,24 @@ void motorVelCallback_2(const std_msgs::Float64::ConstPtr& msg)
 {
     // Set the motor velocity using the received message value
     velocity_2 = msg->data;
+    last_callback_time = ros::Time::now();
+    // std::cout << "I updated the velocity to: " << velocity << std::endl;
+    
+}
+
+void motorPosCallback_1(const std_msgs::Float64::ConstPtr& msg)
+{
+    // Set the motor velocity using the received message value
+    position_1 = msg->data;
+    last_callback_time = ros::Time::now();
+    // std::cout << "I updated the velocity to: " << velocity << std::endl;
+    
+}
+
+void motorposCallback_2(const std_msgs::Float64::ConstPtr& msg)
+{
+    // Set the motor velocity using the received message value
+    position_2 = msg->data;
     last_callback_time = ros::Time::now();
     // std::cout << "I updated the velocity to: " << velocity << std::endl;
     
@@ -169,12 +193,15 @@ void worker()
         ** Your lowlevel control input / measurement logic goes here.
         ** Different logic can be implemented for each device.
          */
+
+        // anydrive::AnydriveEthercatSlave::SharedPtr any_slave_ptr = std::dynamic_pointer_cast<anydrive::AnydriveEthercatSlave>(slave); // I think it should be here, we can talk about code efficiency later 
+
         for(const auto & slave:configurator->getSlaves())
-        {
+        {   
             // Anydrive
             if(configurator->getInfoForSlave(slave).type == EthercatDeviceConfigurator::EthercatSlaveType::Anydrive)
             {
-                anydrive::AnydriveEthercatSlave::SharedPtr any_slave_ptr = std::dynamic_pointer_cast<anydrive::AnydriveEthercatSlave>(slave);
+                anydrive::AnydriveEthercatSlave::SharedPtr any_slave_ptr = std::dynamic_pointer_cast<anydrive::AnydriveEthercatSlave>(slave); // cahce 
 
                 // if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Calibrate){
 
@@ -201,40 +228,37 @@ void worker()
                     // std::cout << "motor vel: " << velocity << std::endl;
 
 
-                    // cmd.setPidGains()
-
-                    // if (((readingex_1.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)) && any_slave_ptr->getName() == "Dynadrive2"){
-                    //     cmd.setJointVelocity(0);
-                    // } 
-                    // if (any_slave_ptr->getName() == "Dynadrive2"){
-                    //     cmd.setJointVelocity(velocity_1);
-                    // } 
-                    // if (((readingex_2.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)) && any_slave_ptr->getName() == "Dynadrive1"){
-                    //     cmd.setJointVelocity(0);
-                    // } 
-                    // if (any_slave_ptr->getName() == "Dynadrive1"){
-                    //     cmd.setJointVelocity(velocity_2);
-                    // }
-
-                    if (any_slave_ptr->getName() == "Dynadrive1"){
-                        if ((readingex_1.getState().getJointPosition() >= 1.48353) || (readingex_1.getState().getJointPosition() <= -1.48353)){
+                    if (any_slave_ptr->getName() == "DynadrivePrecession1"){
+                        if ((readingex_vel_1.getState().getJointPosition() >= 1.48353) || (readingex_vel_1.getState().getJointPosition() <= -1.48353)){
                             cmd.setJointVelocity(0);
                         } else {
                             cmd.setJointVelocity(velocity_1);
                         }
                      } 
-                    if (any_slave_ptr->getName() == "Dynadrive2"){
-                        if ((readingex_2.getState().getJointPosition() >= 1.48353) || (readingex_2.getState().getJointPosition() <= -1.48353)){
+                    if (any_slave_ptr->getName() == "DynadrivePrecession2"){
+                        if ((readingex_vel_2.getState().getJointPosition() >= 1.48353) || (readingex_vel_2.getState().getJointPosition() <= -1.48353)){
                             cmd.setJointVelocity(0);
                         } else {
                             cmd.setJointVelocity(velocity_2);
                         }
                     }
 
-                    
-                    
-
-                    // cmd.setJointVelocity()
+                    if (any_slave_ptr->getName() == "DynadriveSteering1"){
+                        if ((readingex_pos_1.getState().getJointPosition() >= 1.74533) || (readingex_pos_1.getState().getJointPosition() <= -1.74533)){
+                            cmd.setJointVelocity(0);
+                        } else {
+                            cmd.setModeEnum(anydrive::mode::ModeEnum::JointPosition);
+                            cmd.setJointPosition(position_1);
+                        }
+                     } 
+                    if (any_slave_ptr->getName() == "DynadriveSteering2"){
+                        if ((readingex_pos_2.getState().getJointPosition() >= 1.74533) || (readingex_pos_2.getState().getJointPosition() <= -1.74533)){
+                            cmd.setJointVelocity(0);
+                        } else {
+                            cmd.setModeEnum(anydrive::mode::ModeEnum::JointPosition);
+                            cmd.setJointPosition(position_2);
+                        }
+                    }
 
                                     
                     
@@ -379,29 +403,50 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
               << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
     std::cout << "Position: " << reading.getState().getJointPosition() << std::endl;
 
-    std_msgs::Float64MultiArray pub_read_1;
-    std_msgs::Float64MultiArray pub_read_2; 
+    std_msgs::Float64MultiArray pub_read_vel_1;
+    std_msgs::Float64MultiArray pub_read_vel_2; 
+    std_msgs::Float64MultiArray pub_read_pos_1;
+    std_msgs::Float64MultiArray pub_read_pos_2; 
 
-    pub_read_1.data.resize(2); // Resize the data vector to store 2 elements
-    pub_read_2.data.resize(2); // Resize the data vector to store 2 elements
+    pub_read_vel_1.data.resize(2); // Resize the data vector to store 2 elements
+    pub_read_vel_2.data.resize(2); 
+    pub_read_pos_1.data.resize(2); 
+    pub_read_pos_2.data.resize(2); 
 
-    if (name == "Dynadrive1"){
+    if (name == "DynadrivePrecession1"){
 
-        readingex_1 = reading;
+        readingex_vel_1 = reading;
 
-        pub_read_1.data[0] = reading.getState().getJointPosition();
-        pub_read_1.data[1] = reading.getState().getJointVelocity();
-        readingextended_1.publish(pub_read_1);
-
+        pub_read_vel_1.data[0] = reading.getState().getJointPosition();
+        pub_read_vel_1.data[1] = reading.getState().getJointVelocity();
+        readingextended_vel_1.publish(pub_read_vel_1);
     }
 
-    if (name == "Dynadrive2"){
+    if (name == "DynadrivePrecession2"){
 
-        readingex_2 = reading;
+        readingex_vel_2 = reading;
 
-        pub_read_2.data[0] = reading.getState().getJointPosition();
-        pub_read_2.data[1] = reading.getState().getJointVelocity();
-        readingextended_2.publish(pub_read_2);
+        pub_read_vel_2.data[0] = reading.getState().getJointPosition();
+        pub_read_vel_2.data[1] = reading.getState().getJointVelocity();
+        readingextended_vel_2.publish(pub_read_vel_2);
+    }
+
+    if (name == "DynadriveSteering1"){
+
+        readingex_pos_1 = reading;
+
+        pub_read_pos_1.data[0] = reading.getState().getJointPosition();
+        pub_read_pos_1.data[1] = reading.getState().getJointVelocity();
+        readingextended_pos_1.publish(pub_read_pos_1);
+    }
+
+    if (name == "DynadriveSteering2"){
+
+        readingex_pos_2 = reading;
+
+        pub_read_pos_2.data[0] = reading.getState().getJointPosition();
+        pub_read_pos_2.data[1] = reading.getState().getJointVelocity();
+        readingextended_pos_2.publish(pub_read_pos_2);
     }
     
     
@@ -424,12 +469,20 @@ void subscriberThread()
 {   
      last_callback_time = ros::Time::now();
     ros::NodeHandle nh;
-    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_1", 10, motorVelCallback_1);  
-    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_2", 10, motorVelCallback_2);  
+    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 10, motorVelCallback_1);  
+    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 10, motorVelCallback_2);  
+    
+    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 10, motorVelCallback_1);  
+    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 10, motorVelCallback_2); 
+
+    readingextended_vel_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_1",1);
+    readingextended_vel_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_2",1);
+
+    readingextended_pos_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_1",1);
+    readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
+
     ros::Subscriber rc_state = nh.subscribe("/rc", 10, rcCallback);
-    readingextended_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_1",1);
-    readingextended_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_2",1);
-    ros::Timer timer = nh.createTimer(ros::Duration(0.1), timerCallback); // 100ms timer
+    ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 100ms timer
 
     ros::spin();
 }

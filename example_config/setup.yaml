@@ -10,17 +10,31 @@ ethercat_devices:
   #   ethercat_address:   1
 
   - type:               Anydrive
-    name:               Dynadrive1
+    name:               DynadriveSteering1
     configuration_file: device_configurations/anydrive.yaml
     ethercat_bus:       enx00e04c680ba4
     ethercat_address:   1
     ethercat_pdo_type:  C
 
   - type:               Anydrive
-    name:               Dynadrive2
+    name:               DynadrivePrecession1
     configuration_file: device_configurations/anydrive.yaml
     ethercat_bus:       enx00e04c680ba4
     ethercat_address:   2
+    ethercat_pdo_type:  C
+
+  - type:               Anydrive
+    name:               DynadrivePrecession2
+    configuration_file: device_configurations/anydrive.yaml
+    ethercat_bus:       enx00e04c680ba4
+    ethercat_address:   3
+    ethercat_pdo_type:  C
+
+  - type:               Anydrive
+    name:               DynadriveSteering2
+    configuration_file: device_configurations/anydrive.yaml
+    ethercat_bus:       enx00e04c680ba4
+    ethercat_address:   4
     ethercat_pdo_type:  C
 
   # - type:               Maxon

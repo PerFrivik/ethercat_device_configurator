@@ -396,9 +396,9 @@ modes:
   # More control gains              
 - name:                             JointPosition
   gains:                            
-    p:                              10.0
-    i:                              0.078
-    d:                              0.163
+    p:                              50
+    i:                              0.005
+    d:                              0.2
 
 - name:                             JointVelocity
   gains:                            
