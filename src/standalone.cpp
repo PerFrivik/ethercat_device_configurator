@@ -125,7 +125,7 @@ void motorPosCallback_1(const std_msgs::Float64::ConstPtr& msg)
     
 }
 
-void motorposCallback_2(const std_msgs::Float64::ConstPtr& msg)
+void motorPosCallback_2(const std_msgs::Float64::ConstPtr& msg)
 {
     // Set the motor velocity using the received message value
     position_2 = msg->data;
@@ -472,8 +472,8 @@ void subscriberThread()
     ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 10, motorVelCallback_1);  
     ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 10, motorVelCallback_2);  
     
-    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 10, motorVelCallback_1);  
-    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 10, motorVelCallback_2); 
+    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 10, motorPosCallback_1);  
+    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 10, motorPosCallback_2); 
 
     readingextended_vel_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_1",1);
     readingextended_vel_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_2",1);
