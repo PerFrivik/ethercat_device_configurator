@@ -187,8 +187,8 @@ joint_position_limits:
     # Unit                          rad
     # Range                         (-.inf, .inf)
     # Default                       Value stored on device.
-    min:                            -1.5708
-    max:                            1.5708
+    min:                            -1.9
+    max:                            1.9
 
   # Parameter                       hard
   # Description                     Map containing the hard joint position 
