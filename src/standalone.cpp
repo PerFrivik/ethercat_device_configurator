@@ -220,6 +220,13 @@ void worker()
                 // std::cout << "name of the motor: " << name_of_motor << std::endl;
                 // std::cout << " " << std::endl;
 
+                if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Configure)
+                {
+                    std::cout << "setting anydrives back into ControlOp mode" << std::endl;
+                    any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
+                    std::cout << "set: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
+                }
+
                 if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::ControlOp)
                 {
                     anydrive::Command cmd;
