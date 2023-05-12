@@ -1,5 +1,5 @@
 ethercat_master:
-  time_step:                          0.0025
+  time_step:                          0.002
   update_rate_too_low_warn_threshold: 50
 
 ethercat_devices:
@@ -32,7 +32,7 @@ ethercat_devices:
 
   - type:               Anydrive
     name:               DynadriveSteering2
-    configuration_file: device_configurations/anydrive.yaml
+    configuration_file: device_configurations/anydrivesteering.yaml
     ethercat_bus:       enx00e04c680ba4
     ethercat_address:   4
     ethercat_pdo_type:  C
