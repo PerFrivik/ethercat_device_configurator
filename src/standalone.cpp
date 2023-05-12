@@ -216,16 +216,13 @@ void worker()
 
                 name_of_motor = any_slave_ptr->getName();
 
-                // std::cout << " " << std::endl;
-                // std::cout << "name of the motor: " << name_of_motor << std::endl;
-                // std::cout << " " << std::endl;
 
-                if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Configure)
-                {
-                    std::cout << "setting anydrives back into ControlOp mode" << std::endl;
-                    any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
-                    std::cout << "set: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
-                }
+                // if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Configure)
+                // {
+                //     std::cout << "setting anydrives back into ControlOp mode" << std::endl;
+                //     any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
+                //     std::cout << "set: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
+                // }
 
                 if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::ControlOp)
                 {
@@ -406,9 +403,9 @@ void signal_handler(int sig)
 // Some dummy callbacks
 void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended& reading)
 {
-    std::cout << "Reading of anydrive '" << name << "'\n"
-              << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
-    std::cout << "Position: " << reading.getState().getJointPosition() << std::endl;
+    // std::cout << "Reading of anydrive '" << name << "'\n"
+    //           << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
+    // std::cout << "Position: " << reading.getState().getJointPosition() << std::endl;
 
     std_msgs::Float64MultiArray pub_read_vel_1;
     std_msgs::Float64MultiArray pub_read_vel_2; 
@@ -572,7 +569,16 @@ int main(int argc, char**argv)
             anydrive::AnydriveEthercatSlave::SharedPtr any_slave_ptr = std::dynamic_pointer_cast<anydrive::AnydriveEthercatSlave>(slave);
             any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
             std::cout << "Putting slave into operational mode: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
+
+            // if(any_slave_ptr->getActiveStateEnum() == anydrive::fsm::StateEnum::Configure)
+            // {
+            //     std::cout << "setting anydrives back into ControlOp mode" << std::endl;
+            //     any_slave_ptr->setFSMGoalState(anydrive::fsm::StateEnum::ControlOp, false,0,0);
+            //     std::cout << "set: " << any_slave_ptr->getName() << " : " << any_slave_ptr->getAddress() << std::endl;
+            // }
         }
+
+
 // #endif
     }
 
