@@ -485,7 +485,7 @@ void subscriberThread()
     readingextended_pos_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_1",1);
     readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
 
-    ros::Subscriber rc_state = nh.subscribe("/rc", 10, rcCallback);
+    ros::Subscriber rc_state = nh.subscribe("/rc_file", 10, rcCallback);
     ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 100ms timer
 
     ros::spin();
