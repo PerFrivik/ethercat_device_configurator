@@ -156,7 +156,7 @@ void worker()
     bool rtSuccess = true;
     for(const auto & master: configurator->getMasters())
     {
-        rtSuccess &= master->setRealtimePriority(99);
+        rtSuccess &= master->setRealtimePriority(48);
     }
     std::cout << "Setting RT Priority: " << (rtSuccess? "successful." : "not successful. Check user privileges.") << std::endl;
 
@@ -362,7 +362,7 @@ void worker()
 void signal_handler(int sig)
 {   
 
-    ros::shutdown();
+    ros::shutdown(); //move this one down and see if that fixes the issue, the issue could be that ros is blocking, the last option would be to make sure to set the shut down state in the yaml file different
     /*
     ** Pre shutdown procedure.
     ** The devices execute procedures (e.g. state changes) that are necessary for a
@@ -379,7 +379,12 @@ void signal_handler(int sig)
 
     // stop the PDO communication at the next update of the communication loop
     abrt = true;
-    worker_thread->join();
+    if(worker_thread){
+        if(worker_thread->joinable()){
+         worker_thread->join();
+        }
+    }
+    
 
     /*
     ** Completely halt the EtherCAT communication.
@@ -507,7 +512,7 @@ int main(int argc, char**argv)
     std::thread subscriber(subscriberThread);
 
     // Set the abrt_ flag upon receiving an interrupt signal (e.g. Ctrl-c)
-    std::signal(SIGINT, signal_handler);
+    std::signal(SIGINT, signal_handler); //check if i shoudl register the other one ros::init(argc, argv, "my_node_name", ros::init_options::NoSigintHandler); http://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
 
     if(argc < 2)
     {

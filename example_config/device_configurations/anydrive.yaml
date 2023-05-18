@@ -451,7 +451,7 @@ goal_states:
   #                                  "Standby"}
   # Default                         "NA"
   startup:                          "NA"
-  shutdown:                         "NA"
+  shutdown:                         "Standy"
 
 # Parameter                         gear_joint_velocity_filter
 # Description                       List containing gear and joint
