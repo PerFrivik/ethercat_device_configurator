@@ -11,7 +11,7 @@ ethercat_devices:
 
   - type:               Anydrive
     name:               DynadriveSteering1
-    configuration_file: device_configurations/anydrive.yaml
+    configuration_file: device_configurations/anydrivesteering1.yaml
     ethercat_bus:       enp88s0
     ethercat_address:   1
     ethercat_pdo_type:  C
