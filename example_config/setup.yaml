@@ -12,28 +12,28 @@ ethercat_devices:
   - type:               Anydrive
     name:               DynadriveSteering1
     configuration_file: device_configurations/anydrive.yaml
-    ethercat_bus:       enx00e04c680ba4
+    ethercat_bus:       enp88s0
     ethercat_address:   1
     ethercat_pdo_type:  C
 
   - type:               Anydrive
     name:               DynadrivePrecession1
     configuration_file: device_configurations/anydrive.yaml
-    ethercat_bus:       enx00e04c680ba4
+    ethercat_bus:       enp88s0
     ethercat_address:   2
     ethercat_pdo_type:  C
 
   - type:               Anydrive
     name:               DynadrivePrecession2
     configuration_file: device_configurations/anydrive.yaml
-    ethercat_bus:       enx00e04c680ba4
+    ethercat_bus:       enp88s0
     ethercat_address:   3
     ethercat_pdo_type:  C
 
   - type:               Anydrive
     name:               DynadriveSteering2
     configuration_file: device_configurations/anydrivesteering.yaml
-    ethercat_bus:       enx00e04c680ba4
+    ethercat_bus:       enp88s0
     ethercat_address:   4
     ethercat_pdo_type:  C
 
