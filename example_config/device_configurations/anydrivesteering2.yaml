@@ -131,7 +131,7 @@ joint_torque_integrator_saturation: 40.0
 # Unit                              -
 # Range                             {-1, 1}
 # Default                           Value stored on device.
-direction:                          -1
+direction:                          1
 
 # Parameter                         joint_position_limits
 # Description                       Map containing the joint position limits.
@@ -451,7 +451,7 @@ goal_states:
   #                                  "Standby"}
   # Default                         "NA"
   startup:                          "NA"
-  shutdown:                         "Standy"
+  shutdown:                         "Standby"
 
 # Parameter                         gear_joint_velocity_filter
 # Description                       List containing gear and joint

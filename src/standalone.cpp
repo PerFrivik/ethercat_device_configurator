@@ -235,14 +235,18 @@ void worker()
                     if (any_slave_ptr->getName() == "DynadrivePrecession1"){
                         if ((readingex_vel_1.getState().getJointPosition() >= 1.48353) || (readingex_vel_1.getState().getJointPosition() <= -1.48353)){
                             cmd.setJointVelocity(0);
+                            // std::cout << "should not be in here 1" << std::endl;
                         } else {
+                            // std::cout << "vel_1 " << velocity_1 << std::endl;
                             cmd.setJointVelocity(velocity_1);
                         }
                      } 
                     if (any_slave_ptr->getName() == "DynadrivePrecession2"){
                         if ((readingex_vel_2.getState().getJointPosition() >= 1.48353) || (readingex_vel_2.getState().getJointPosition() <= -1.48353)){
                             cmd.setJointVelocity(0);
+                            // std::cout << "should not be in here" << std::endl;
                         } else {
+                            // std::cout << "vel_2 " << velocity_2 << std::endl;
                             cmd.setJointVelocity(velocity_2);
                         }
                     }
@@ -476,13 +480,13 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
 
 void subscriberThread()
 {   
-     last_callback_time = ros::Time::now();
+    last_callback_time = ros::Time::now();
     ros::NodeHandle nh;
-    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 10, motorVelCallback_1);  
-    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 10, motorVelCallback_2);  
+    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 1, motorVelCallback_1);  
+    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 1, motorVelCallback_2);  
     
-    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 10, motorPosCallback_1);  
-    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 10, motorPosCallback_2); 
+    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 1, motorPosCallback_1);  
+    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 1, motorPosCallback_2); 
 
     readingextended_vel_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_1",1);
     readingextended_vel_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_2",1);
@@ -491,7 +495,7 @@ void subscriberThread()
     readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
 
     ros::Subscriber rc_state = nh.subscribe("/rc_file", 10, rcCallback);
-    ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 100ms timer
+    ros::Timer timer = nh.createTimer(ros::Duration(0.002), timerCallback); // 100ms timer
 
     ros::spin();
 }
