@@ -233,7 +233,7 @@ void worker()
 
 
                     if (any_slave_ptr->getName() == "DynadrivePrecession1"){
-                        if ((readingex_vel_1.getState().getJointPosition() >= 1.48353) || (readingex_vel_1.getState().getJointPosition() <= -1.48353)){
+                        if ((readingex_vel_1.getState().getJointPosition() >= 1.6) || (readingex_vel_1.getState().getJointPosition() <= -1.6)){
                             cmd.setJointVelocity(0);
                             // std::cout << "should not be in here 1" << std::endl;
                         } else {
@@ -242,7 +242,7 @@ void worker()
                         }
                      } 
                     if (any_slave_ptr->getName() == "DynadrivePrecession2"){
-                        if ((readingex_vel_2.getState().getJointPosition() >= 1.48353) || (readingex_vel_2.getState().getJointPosition() <= -1.48353)){
+                        if ((readingex_vel_2.getState().getJointPosition() >= 1.6) || (readingex_vel_2.getState().getJointPosition() <= -1.6)){
                             cmd.setJointVelocity(0);
                             // std::cout << "should not be in here" << std::endl;
                         } else {
