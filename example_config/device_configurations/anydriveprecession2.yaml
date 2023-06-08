@@ -131,7 +131,7 @@ joint_torque_integrator_saturation: 40.0
 # Unit                              -
 # Range                             {-1, 1}
 # Default                           Value stored on device.
-direction:                          -1
+direction:                          1
 
 # Parameter                         joint_position_limits
 # Description                       Map containing the joint position limits.
@@ -402,7 +402,7 @@ modes:
 
 - name:                             JointVelocity
   gains:                            
-    p:                              2
+    p:                              20
     i:                              0.0005
     d:                              0.0001
 
