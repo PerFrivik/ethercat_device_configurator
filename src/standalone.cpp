@@ -74,10 +74,40 @@ ros::Publisher  readingextended_vel_1;
 ros::Publisher  readingextended_vel_2;
 ros::Publisher  readingextended_pos_1;
 ros::Publisher  readingextended_pos_2;
+
+
 anydrive::ReadingExtended readingex_vel_1;
 anydrive::ReadingExtended readingex_vel_2;
 anydrive::ReadingExtended readingex_pos_1;
 anydrive::ReadingExtended readingex_pos_2;
+
+ros::Publisher clamp_joint_1_angle_pub_;
+ros::Publisher clamp_joint_2_angle_pub_;
+ros::Publisher gyro_joint_1_angle_pub_;
+ros::Publisher gyro_joint_2_angle_pub_;
+ros::Publisher wheel_joint_1_angle_pub_;
+ros::Publisher wheel_joint_2_angle_pub_;
+
+ros::Publisher clamp_joint_1_velocity_pub_;
+ros::Publisher clamp_joint_2_velocity_pub_;
+ros::Publisher gyro_joint_1_velocity_pub_;
+ros::Publisher gyro_joint_2_velocity_pub_;
+ros::Publisher wheel_joint_1_velocity_pub_;
+ros::Publisher wheel_joint_2_velocity_pub_;
+
+double clamp_joint_1_angle_;
+double clamp_joint_2_angle_;
+double gyro_joint_1_angle_;
+double gyro_joint_2_angle_;
+double wheel_joint_1_angle_;
+double wheel_joint_2_angle_;
+
+double clamp_joint_1_velocity_;
+double clamp_joint_2_velocity_;
+double gyro_joint_1_velocity_;
+double gyro_joint_2_velocity_;
+double wheel_joint_1_velocity_;
+double wheel_joint_2_velocity_;
 
 
 
@@ -425,10 +455,18 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
     if (name == "DynadrivePrecession1"){
 
         readingex_vel_1 = reading;
+        
+        std_msgs::Float64 gyro_joint_1_angle_msg;
+        gyro_joint_1_angle_msg.data = reading.getState().getJointPosition();
+        gyro_joint_1_angle_pub_.publish(gyro_joint_1_angle_msg);
 
-        pub_read_vel_1.data[0] = reading.getState().getJointPosition();
-        pub_read_vel_1.data[1] = reading.getState().getJointVelocity();
-        readingextended_vel_1.publish(pub_read_vel_1);
+        std_msgs::Float64 gyro_joint_1_velocity_msg;
+        gyro_joint_1_velocity_msg.data = reading.getState().getJointVelocity();
+        gyro_joint_1_velocity_pub_.publish(gyro_joint_1_velocity_msg);
+
+        // pub_read_vel_1.data[0] = reading.getState().getJointPosition();
+        // pub_read_vel_1.data[1] = reading.getState().getJointVelocity();
+        // readingextended_vel_1.publish(pub_read_vel_1);
     }
 
     if (name == "DynadrivePrecession2"){
@@ -478,20 +516,30 @@ void subscriberThread()
 {   
      last_callback_time = ros::Time::now();
     ros::NodeHandle nh;
-    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 10, motorVelCallback_1);  
-    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 10, motorVelCallback_2);  
+    ros::Subscriber motor_vel_sub_1 = nh.subscribe("/motor_velocity_precession_1", 1, motorVelCallback_1);  
+    ros::Subscriber motor_vel_sub_2 = nh.subscribe("/motor_velocity_precession_2", 1, motorVelCallback_2);  
     
-    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 10, motorPosCallback_1);  
-    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 10, motorPosCallback_2); 
+    ros::Subscriber motor_pos_sub_1 = nh.subscribe("/motor_position_steering_1", 1, motorPosCallback_1);  
+    ros::Subscriber motor_pos_sub_2 = nh.subscribe("/motor_position_steering_2", 1, motorPosCallback_2); 
 
-    readingextended_vel_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_1",1);
-    readingextended_vel_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_2",1);
+    // readingextended_vel_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_1",1);
+    // readingextended_vel_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_vel_2",1);
 
-    readingextended_pos_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_1",1);
-    readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
+    // readingextended_pos_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_1",1);
+    // readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
+
+    clamp_joint_1_angle_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_1_angle", 1);
+    clamp_joint_2_angle_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_2_angle", 1);
+    gyro_joint_1_angle_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_1_angle", 1);
+    gyro_joint_2_angle_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_2_angle", 1);
+
+    clamp_joint_1_velocity_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_1_velocity", 1);
+    clamp_joint_2_velocity_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_2_velocity", 1);
+    gyro_joint_1_velocity_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_1_velocity", 1);
+    gyro_joint_2_velocity_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_2_velocity", 1);
 
     ros::Subscriber rc_state = nh.subscribe("/rc_file", 10, rcCallback);
-    ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 100ms timer
+    ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 200ms timer
 
     ros::spin();
 }
