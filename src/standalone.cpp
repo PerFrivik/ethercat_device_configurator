@@ -95,19 +95,19 @@ ros::Publisher gyro_joint_2_velocity_pub_;
 ros::Publisher wheel_joint_1_velocity_pub_;
 ros::Publisher wheel_joint_2_velocity_pub_;
 
-double clamp_joint_1_angle_;
-double clamp_joint_2_angle_;
-double gyro_joint_1_angle_;
-double gyro_joint_2_angle_;
-double wheel_joint_1_angle_;
-double wheel_joint_2_angle_;
+// double clamp_joint_1_angle_;
+// double clamp_joint_2_angle_;
+// double gyro_joint_1_angle_;
+// double gyro_joint_2_angle_;
+// double wheel_joint_1_angle_;
+// double wheel_joint_2_angle_;
 
-double clamp_joint_1_velocity_;
-double clamp_joint_2_velocity_;
-double gyro_joint_1_velocity_;
-double gyro_joint_2_velocity_;
-double wheel_joint_1_velocity_;
-double wheel_joint_2_velocity_;
+// double clamp_joint_1_velocity_;
+// double clamp_joint_2_velocity_;
+// double gyro_joint_1_velocity_;
+// double gyro_joint_2_velocity_;
+// double wheel_joint_1_velocity_;
+// double wheel_joint_2_velocity_;
 
 
 
@@ -442,15 +442,15 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
     //           << "Joint velocity: " << reading.getState().getJointVelocity() << "\n\n";
     // std::cout << "Position: " << reading.getState().getJointPosition() << std::endl;
 
-    std_msgs::Float64MultiArray pub_read_vel_1;
-    std_msgs::Float64MultiArray pub_read_vel_2; 
-    std_msgs::Float64MultiArray pub_read_pos_1;
-    std_msgs::Float64MultiArray pub_read_pos_2; 
+    // std_msgs::Float64MultiArray pub_read_vel_1;
+    // std_msgs::Float64MultiArray pub_read_vel_2; 
+    // std_msgs::Float64MultiArray pub_read_pos_1;
+    // std_msgs::Float64MultiArray pub_read_pos_2; 
 
-    pub_read_vel_1.data.resize(2); // Resize the data vector to store 2 elements
-    pub_read_vel_2.data.resize(2); 
-    pub_read_pos_1.data.resize(2); 
-    pub_read_pos_2.data.resize(2); 
+    // pub_read_vel_1.data.resize(2); // Resize the data vector to store 2 elements
+    // pub_read_vel_2.data.resize(2); 
+    // pub_read_pos_1.data.resize(2); 
+    // pub_read_pos_2.data.resize(2); 
 
     if (name == "DynadrivePrecession1"){
 
@@ -473,27 +473,51 @@ void anydriveReadingCb(const std::string& name, const anydrive::ReadingExtended&
 
         readingex_vel_2 = reading;
 
-        pub_read_vel_2.data[0] = reading.getState().getJointPosition();
-        pub_read_vel_2.data[1] = reading.getState().getJointVelocity();
-        readingextended_vel_2.publish(pub_read_vel_2);
+        std_msgs::Float64 gyro_joint_2_angle_msg;
+        gyro_joint_2_angle_msg.data = reading.getState().getJointPosition();
+        gyro_joint_2_angle_pub_.publish(gyro_joint_2_angle_msg);
+
+        std_msgs::Float64 gyro_joint_2_velocity_msg;
+        gyro_joint_2_velocity_msg.data = reading.getState().getJointVelocity();
+        gyro_joint_2_velocity_pub_.publish(gyro_joint_2_velocity_msg);
+
+        // pub_read_vel_2.data[0] = reading.getState().getJointPosition();
+        // pub_read_vel_2.data[1] = reading.getState().getJointVelocity();
+        // readingextended_vel_2.publish(pub_read_vel_2);
     }
 
     if (name == "DynadriveSteering1"){
 
         readingex_pos_1 = reading;
 
-        pub_read_pos_1.data[0] = reading.getState().getJointPosition();
-        pub_read_pos_1.data[1] = reading.getState().getJointVelocity();
-        readingextended_pos_1.publish(pub_read_pos_1);
+        std_msgs::Float64 clamp_joint_1_angle_msg;
+        clamp_joint_1_angle_msg.data = reading.getState().getJointPosition();
+        clamp_joint_1_angle_pub_.publish(clamp_joint_1_angle_msg);
+
+        std_msgs::Float64 clamp_joint_1_velocity_msg;
+        clamp_joint_1_velocity_msg.data = reading.getState().getJointVelocity();;
+        clamp_joint_1_velocity_pub_.publish(clamp_joint_1_velocity_msg);
+
+        // pub_read_pos_1.data[0] = reading.getState().getJointPosition();
+        // pub_read_pos_1.data[1] = reading.getState().getJointVelocity();
+        // readingextended_pos_1.publish(pub_read_pos_1);
     }
 
     if (name == "DynadriveSteering2"){
 
         readingex_pos_2 = reading;
 
-        pub_read_pos_2.data[0] = reading.getState().getJointPosition();
-        pub_read_pos_2.data[1] = reading.getState().getJointVelocity();
-        readingextended_pos_2.publish(pub_read_pos_2);
+        std_msgs::Float64 clamp_joint_2_angle_msg;
+        clamp_joint_2_angle_msg.data = reading.getState().getJointPosition();
+        clamp_joint_2_angle_pub_.publish(clamp_joint_2_angle_msg);
+
+        std_msgs::Float64 clamp_joint_2_velocity_msg;
+        clamp_joint_2_velocity_msg.data = reading.getState().getJointVelocity();;
+        clamp_joint_2_velocity_pub_.publish(clamp_joint_2_velocity_msg);
+
+        // pub_read_pos_2.data[0] = reading.getState().getJointPosition();
+        // pub_read_pos_2.data[1] = reading.getState().getJointVelocity();
+        // readingextended_pos_2.publish(pub_read_pos_2);
     }
     
     
