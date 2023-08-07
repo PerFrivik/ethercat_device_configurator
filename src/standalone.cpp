@@ -552,15 +552,15 @@ void subscriberThread()
     // readingextended_pos_1 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_1",1);
     // readingextended_pos_2 = nh.advertise<std_msgs::Float64MultiArray>("reading_extended_pos_2",1);
 
-    clamp_joint_1_angle_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_1_angle", 1);
-    clamp_joint_2_angle_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_2_angle", 1);
-    gyro_joint_1_angle_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_1_angle", 1);
-    gyro_joint_2_angle_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_2_angle", 1);
+    clamp_joint_1_angle_pub_ = nh.advertise<std_msgs::Float64>("clamp_joint_1_angle", 1);
+    clamp_joint_2_angle_pub_ = nh.advertise<std_msgs::Float64>("clamp_joint_2_angle", 1);
+    gyro_joint_1_angle_pub_ = nh.advertise<std_msgs::Float64>("gyro_joint_1_angle", 1);
+    gyro_joint_2_angle_pub_ = nh.advertise<std_msgs::Float64>("gyro_joint_2_angle", 1);
 
-    clamp_joint_1_velocity_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_1_velocity", 1);
-    clamp_joint_2_velocity_pub_ = nh_.advertise<std_msgs::Float64>("clamp_joint_2_velocity", 1);
-    gyro_joint_1_velocity_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_1_velocity", 1);
-    gyro_joint_2_velocity_pub_ = nh_.advertise<std_msgs::Float64>("gyro_joint_2_velocity", 1);
+    clamp_joint_1_velocity_pub_ = nh.advertise<std_msgs::Float64>("clamp_joint_1_velocity", 1);
+    clamp_joint_2_velocity_pub_ = nh.advertise<std_msgs::Float64>("clamp_joint_2_velocity", 1);
+    gyro_joint_1_velocity_pub_ = nh.advertise<std_msgs::Float64>("gyro_joint_1_velocity", 1);
+    gyro_joint_2_velocity_pub_ = nh.advertise<std_msgs::Float64>("gyro_joint_2_velocity", 1);
 
     ros::Subscriber rc_state = nh.subscribe("/rc_file", 10, rcCallback);
     ros::Timer timer = nh.createTimer(ros::Duration(0.005), timerCallback); // 200ms timer
